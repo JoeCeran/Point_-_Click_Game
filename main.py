@@ -1,6 +1,6 @@
 import pygame
 import random
-from characters.Player import Player
+from main_code.characters.Player import Player
 
 bg = pygame.image.load('assets/backgrounds/Police_station_img2.jpg')
 
