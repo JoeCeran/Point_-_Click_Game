@@ -10,14 +10,10 @@ background_list = []
 music_list = []
 sound_list = []
 
-i = 0
-
-bg = pygame.image.load('assets/backgrounds/Police_station_img2.jpg')
 ############MUSIC###################
 pygame.init()
 pygame.mixer.init()
 
-voice = pygame.mixer.Sound('assets/sounds/voice.ogg')
 GREEN = (0, 255, 0)
 HEIGHT = 100
 WIDTH = 100
@@ -44,20 +40,18 @@ pygame.display.set_caption('Officer Doodly')
 #def action_select(event):
 
 def load_assets():
-    global i
-
+    i = 0
+    j = 0
     for assets in asset_stuff:
-        print(assets)
-        for files in glob.glob('assets/' + asset_stuff[i] + '/*.' + file_type[i]):
-            print(files)
-            print(i)
+        for files in glob.glob('assets/' + asset_stuff[i] + '/*'):
             if (assets == 'backgrounds'):
+                print("background: " + files)
                 background_list.append(files)
             elif (assets == 'music'):
+                print("music: " + files)
                 music_list.append(files)
-                pygame.mixer.music.load(music_list)
-                pygame.mixer.music.play()
             elif (assets == 'sounds'):
+                print("sounds: " + files)
                 sound_list.append(files)
             i = i + 1
 
@@ -65,11 +59,25 @@ def game_loop():
     gameExit = False
     option = 'search'
 
+    with open('main_code/game_data.txt') as f:
+        lines = f.readlines()
+        print(lines)
+        loaded_background = int(lines[0].replace('\n', ''))
+        loaded_music = int(lines[1].replace('\n', ''))
+        loaded_sound = int(lines[2].replace('\n', ''))
+
+        bg = pygame.image.load(background_list[loaded_background])
+        pygame.mixer.music.load(music_list[loaded_music])
+        pygame.mixer.music.play()
+        voice = pygame.mixer.Sound(sound_list[loaded_sound])
+
     while not gameExit:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
+
+            j = 0
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
