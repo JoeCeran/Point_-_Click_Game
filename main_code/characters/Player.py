@@ -36,17 +36,17 @@ class Player(pygame.sprite.Sprite):
 
     #def talk(self):
     #def pick_up
-    def search(self, Object, sound):
-        print("Dooly: " + str(self._x) + " & " + str(self.y))
-        print("Object: " + str(Object.x) + " & " + str(Object.y))
-        try:
+    try:
+        def search(self, Object, sound):
+            print("Dooly: " + str(self._x) + " & " + str(self.y))
+            print("Object: " + str(Object.x) + " & " + str(Object.y))
             if (self._x >= (Object.x + 50) or (self._x >= (Object.x - 50))) and ((self._y <= (Object.y + 50)) or (self._y >= (Object.y - 50))):
                 print("You got the " + str(Object.name) + "!")
                 pygame.mixer.Sound.play(sound)
                 return True
             else:
                 print("You need to get closer...")
-        except IndexError:
-            print("There's nothing there!")
+    except IndexError:
+        print("There's nothing there!")
 
 

@@ -36,7 +36,7 @@ pygame.display.set_caption('Officer Doodly!')
 def import_assets():
     i = 0
     for assets in asset_stuff:
-        for files in glob.glob('assets/' + asset_stuff[i] + '/*'):
+        for files in sorted(glob.glob('assets/' + asset_stuff[i] + '/*')):
             if (assets == 'backgrounds'):
                 print("background: " + files)
                 background_list.append(files)
@@ -86,9 +86,6 @@ def load_assets(room_id):
         object_map.append(desk)
 
     return bg, voice, player, desk
-
-def play_sound(sound):
-    pygame.mixer.Sound.play(sound)
 
 def draw_screen(bg):
 
