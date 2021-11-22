@@ -2,21 +2,34 @@ import pygame, glob
 from main_code.characters.Player import Player
 from main_code.Object import Object
 
-asset_stuff = ['backgrounds', 'music', 'sounds', 'sprites']
-file_type = ['jpg', '.ogg', '.ogg', 'png']
-main_code_stuff = ['characters', 'rooms']
 
+asset_dict = {
+    1: {'type': "backgrounds", 'location': []},
+    2: {'type': "music", 'location': []},
+    3: {'type': "sounds", 'location': []},
+    4: {'type': "sprites", 'location': []}}
+
+game_dict = {
+    1: {'type': "character"},
+    2: {'type:': "object"}
+}
+
+level_dict = {
+    0: {'name': "station",
+        'background': [0],
+        'music': [0],
+        'sound': [0],
+        'character': [0, 1],
+        'object': [0, 1]},
+}
+
+main_code_stuff = ['characters', 'rooms']
 option = 'search'
-background_list = []
-sprite_list = []
-music_list = []
-sound_list = []
-assets_map = []
 character_map = []
 object_map = []
 all_sprites = pygame.sprite.Group()
 bg = ""
-voice = ""
+sound = ""
 player = Player
 desk = Object
 change_location = False
@@ -29,63 +42,57 @@ pygame.mixer.init()
 ############WINDOW & BACKGROUND#############
 display_width = 800
 display_height = 600
-
 gameDisplay = pygame.display.set_mode((display_width, display_height))
 pygame.display.set_caption('Officer Doodly!')
 
 def import_assets():
-    i = 0
-    for assets in asset_stuff:
-        for files in glob.glob('assets/' + asset_stuff[i] + '/*'):
-            if (assets == 'backgrounds'):
-                print("background: " + files)
-                background_list.append(files)
-            elif (assets == 'music'):
-                print("music: " + files)
-                music_list.append(files)
-            elif (assets == 'sounds'):
-                print("sounds: " + files)
-                sound_list.append(files)
-            elif (assets == 'sprites'):
-                print("sprites: " + files)
-                sprite_list.append(files)
-
-        i = i + 1
+    for i in range(1, (len(asset_dict) + 1)):
+        for keys, values in asset_dict[i].items():
+            for files in glob.glob('assets/' + str(values) + '/*'):
+                asset_dict[i]['location'].append(files)
 
 def load_assets(room_id):
 
     global bg
-    global voice
+    global sound
     global all_sprites
     global player
 
-    with open('main_code/game_data.txt') as f:
-        lines = f.readlines()
-        loaded_background = int(lines[room_id].replace('\n', ''))
-        loaded_sprite = int(lines[room_id].replace('\n', ''))
-        loaded_music = int(lines[room_id].replace('\n', ''))
-        loaded_sound = int(lines[room_id].replace('\n', ''))
+    for keys, values in level_dict[0].items():
+        print(keys)
+        for value in level_dict[0][keys]:
+            load_number = value
+            match keys:
+                case 'name':
+                    print("Room " + str(load_number) + " Has been loaded in!")
+                case 'background':
+                    bg = pygame.image.load(asset_dict[1]['location'][load_number])
+                case 'music':
+                    print('music')
+                case 'sound':
+                    sound = pygame.mixer.Sound(asset_dict[3]['location'][load_number])
+                    print('sound' + str(sound))
+                case 'character':
+                    print('character')
+                case 'object':
+                    print('object')
 
-        bg = pygame.image.load(background_list[loaded_background])
+    print(load_number)
+    pygame.mixer.music.load(asset_dict[2]['location'][load_number])
 
-        pygame.mixer.music.load(music_list[loaded_music])
-        pygame.mixer.music.play()
+    image = pygame.image.load(asset_dict[4]['location'][0]).convert_alpha()
+    image2 = pygame.image.load(asset_dict[4]['location'][1]).convert_alpha()
+    image3 = pygame.image.load(asset_dict[4]['location'][2]).convert_alpha()
+    player = Player(100, 400, image)
+    desk = Object("desk", 1, 10, 10, 700, 450, image2)
+    pot = Object("pot", 1, 10, 10, 700, 340, image3)
+    all_sprites.add(player)
+    all_sprites.add(desk)
+    all_sprites.add(pot)
+    character_map.append(player)
+    object_map.append(desk)
 
-        voice = pygame.mixer.Sound(sound_list[loaded_sound])
-
-        image = pygame.image.load(sprite_list[loaded_sprite]).convert_alpha()
-        image2 = pygame.image.load(sprite_list[1]).convert_alpha()
-        image3 = pygame.image.load(sprite_list[2]).convert_alpha()
-        player = Player(100, 400, image)
-        desk = Object("desk", 1, 10, 10, 700, 450, image2)
-        pot = Object("desk", 1, 10, 10, 700, 340, image3)
-        all_sprites.add(player)
-        all_sprites.add(desk)
-        all_sprites.add(pot)
-        character_map.append(player)
-        object_map.append(desk)
-
-    return bg, voice, player, desk
+    return bg, sound, player, desk
 
 def play_sound(sound):
     pygame.mixer.Sound.play(sound)
@@ -111,44 +118,44 @@ def game_loop():
     global change_location
     option = 'search'
     global background
-    global voice
+    global sound
     global player
     global all_sprites
 
-
     load_assets(0)
 
+    pygame.mixer.music.play()
+
     while not gameExit:
+
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
+            match event.type:
+                case pygame.QUIT:
+                    pygame.quit()
+                    quit()
+                case pygame.KEYDOWN:
+                    match event.key:
+                        case pygame.K_LEFT: option = 'search'
+                        case pygame.K_RIGHT: option = 'walk'
+                        case pygame.K_UP: option = 'talk'
+                        case pygame.K_DOWN: option = 'grab'
 
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT:
-                    option = 'search'
-                elif event.key == pygame.K_RIGHT:
-                    option = 'walk'
-                elif event.key == pygame.K_UP:
-                    option = 'talk'
-                elif event.key == pygame.K_DOWN:
-                    option = 'grab'
-
-            if event.type == pygame.MOUSEBUTTONUP:
-                if (option == 'search'):
-                    try:
-                        if character_map[0].search(object_map[0], voice):
-                            all_sprites.remove(object_map[0])
-                            object_map.remove(object_map[0])
-                    except IndexError:
-                        print("There's nothing there!")
-                elif (option == 'walk'):
-                    pos = pygame.mouse.get_pos()
-                    player.walk(pos[0], pos[1])
-                elif (option == 'talk'):
-                    print("Character will talk")
-                elif (option == 'grab'):
-                    print("Character will pick up")
+                case pygame.MOUSEBUTTONUP:
+                    match option:
+                        case 'search':
+                            try:
+                                if character_map[0].search(object_map[0], sound):
+                                    all_sprites.remove(object_map[0])
+                                    object_map.remove(object_map[0])
+                            except IndexError:
+                                print("There's nothing there!")
+                        case 'walk':
+                            pos = pygame.mouse.get_pos()
+                            player.walk(pos[0], pos[1])
+                        case 'talk':
+                            print("Character will talk")
+                        case 'grab':
+                            print("Character will pick up")
 
             draw_screen(bg)
 
