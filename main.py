@@ -94,9 +94,6 @@ def load_assets(room_id):
 
     return bg, sound, player, desk
 
-def play_sound(sound):
-    pygame.mixer.Sound.play(sound)
-
 def draw_screen(bg):
 
     gameDisplay.fill((0, 0, 0))
